@@ -14,6 +14,8 @@
     "format:check": "oxfmt --check .",
     "typecheck": "vue-tsc --noEmit",
     "tauri": "tauri",
+    "tauri:pilot": "tauri-pilot",
+    "tauri:pilot:install": "cargo install tauri-pilot-cli --version 0.7.2 --locked",
     "prepare": "husky"
   },
   "dependencies": {
@@ -44,7 +46,9 @@
   },
   "lint-staged": {
     "*.{ts,tsx,vue,js,json,md}": [
-      "oxfmt --write",
+      "oxfmt --write"
+    ],
+    "*.{ts,tsx,vue,js}": [
       "oxlint --fix"
     ],
     "*.{css,vue}": [

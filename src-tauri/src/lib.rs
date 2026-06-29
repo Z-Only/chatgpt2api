@@ -1,7 +1,9 @@
 pub mod app_state;
+pub mod auth;
 pub mod config;
 pub mod error;
 pub mod models;
+pub mod oauth;
 pub mod reasoning;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

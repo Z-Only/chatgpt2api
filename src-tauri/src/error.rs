@@ -13,4 +13,7 @@ pub enum AppError {
 
     #[error("invalid config: {0}")]
     InvalidConfig(String),
+
+    #[error("auth error: {0}")]
+    Auth(String),
 }

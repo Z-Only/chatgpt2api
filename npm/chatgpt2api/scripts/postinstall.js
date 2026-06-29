@@ -27,22 +27,22 @@ const supportedTargets = {
   "darwin-arm64": {
     assetName: "chatgpt2api-darwin-arm64.tar.gz",
     binaryName: "chatgpt2api",
-    checksumName: "checksums-macOS.txt",
+    checksumName: "checksums-cli-macOS.txt",
   },
   "darwin-x64": {
     assetName: "chatgpt2api-darwin-x64.tar.gz",
     binaryName: "chatgpt2api",
-    checksumName: "checksums-macOS.txt",
+    checksumName: "checksums-cli-macOS.txt",
   },
   "linux-x64": {
     assetName: "chatgpt2api-linux-x64.tar.gz",
     binaryName: "chatgpt2api",
-    checksumName: "checksums-Linux.txt",
+    checksumName: "checksums-cli-Linux.txt",
   },
   "win32-x64": {
     assetName: "chatgpt2api-win32-x64.zip",
     binaryName: "chatgpt2api.exe",
-    checksumName: "checksums-Windows.txt",
+    checksumName: "checksums-cli-Windows.txt",
   },
 };
 

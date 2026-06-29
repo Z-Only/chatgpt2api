@@ -85,3 +85,5 @@ Custom port options:
 Desktop release workflow targets macOS DMG, Windows MSI/NSIS, and Linux AppImage/deb/rpm.
 
 CLI distribution supports npm package installs, Homebrew installs, and direct GitHub release binary archives.
+
+See [`docs/distribution-matrix.md`](docs/distribution-matrix.md) for the supported install matrix and release verification commands.

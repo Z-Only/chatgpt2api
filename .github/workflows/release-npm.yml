@@ -91,9 +91,9 @@ jobs:
         shell: bash
         run: |
           cd release
-          sha256sum chatgpt2api-darwin-*.tar.gz > checksums-macOS.txt
-          sha256sum chatgpt2api-linux-*.tar.gz > checksums-Linux.txt
-          sha256sum chatgpt2api-win32-*.zip > checksums-Windows.txt
+          sha256sum chatgpt2api-darwin-*.tar.gz > checksums-cli-macOS.txt
+          sha256sum chatgpt2api-linux-*.tar.gz > checksums-cli-Linux.txt
+          sha256sum chatgpt2api-win32-*.zip > checksums-cli-Windows.txt
       - name: Publish GitHub release assets
         uses: softprops/action-gh-release@v2
         with:

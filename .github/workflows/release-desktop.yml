@@ -37,27 +37,6 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf rpm
       - run: bun install --frozen-lockfile
       - run: bun tauri build --bundles ${{ matrix.bundles }}
-      - name: Package CLI binary
-        shell: bash
-        run: |
-          mkdir -p artifacts
-          case "${{ runner.arch }}" in
-            ARM64) arch="arm64" ;;
-            X64) arch="x64" ;;
-            *) arch="${{ runner.arch }}" ;;
-          esac
-          cargo build --manifest-path src-tauri/Cargo.toml --release
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            cp src-tauri/target/release/chatgpt2api.exe artifacts/chatgpt2api.exe
-            (cd artifacts && 7z a "chatgpt2api-win32-${arch}.zip" chatgpt2api.exe)
-            rm artifacts/chatgpt2api.exe
-          elif [ "${{ runner.os }}" = "macOS" ]; then
-            cp src-tauri/target/release/chatgpt2api artifacts/chatgpt2api
-            tar -czf "artifacts/chatgpt2api-darwin-${arch}.tar.gz" -C artifacts chatgpt2api
-          else
-            cp src-tauri/target/release/chatgpt2api artifacts/chatgpt2api
-            tar -czf "artifacts/chatgpt2api-linux-${arch}.tar.gz" -C artifacts chatgpt2api
-          fi
       - name: Checksums
         shell: bash
         run: |
@@ -67,14 +46,13 @@ jobs:
             else
               sha256sum "$file"
             fi
-          done < <(find src-tauri/target/release/bundle artifacts -type f \( -name "*.dmg" -o -name "*.msi" -o -name "*.exe" -o -name "*.deb" -o -name "*.rpm" -o -name "*.AppImage" -o -name "*.tar.gz" -o -name "*.zip" \) -print0) > checksums-${{ runner.os }}.txt
+          done < <(find src-tauri/target/release/bundle -type f \( -name "*.dmg" -o -name "*.msi" -o -name "*.exe" -o -name "*.deb" -o -name "*.rpm" -o -name "*.AppImage" \) -print0) > checksums-desktop-${{ runner.os }}.txt
       - uses: actions/upload-artifact@v4
         with:
           name: chatgpt2api-${{ runner.os }}
           path: |
             src-tauri/target/release/bundle/**
-            artifacts/**
-            checksums-${{ runner.os }}.txt
+            checksums-desktop-${{ runner.os }}.txt
       - name: Publish GitHub release assets
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
@@ -86,6 +64,4 @@ jobs:
             src-tauri/target/release/bundle/**/*.deb
             src-tauri/target/release/bundle/**/*.rpm
             src-tauri/target/release/bundle/**/*.AppImage
-            artifacts/*.tar.gz
-            artifacts/*.zip
-            checksums-${{ runner.os }}.txt
+            checksums-desktop-${{ runner.os }}.txt

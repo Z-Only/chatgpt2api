@@ -37,12 +37,12 @@ describe("npm CLI distribution", () => {
   it("maps supported platforms to release assets", () => {
     expect(installer.getPlatformTarget("darwin", "arm64")).toMatchObject({
       assetName: "chatgpt2api-darwin-arm64.tar.gz",
-      checksumName: "checksums-macOS.txt",
+      checksumName: "checksums-cli-macOS.txt",
       binaryName: "chatgpt2api",
     });
     expect(installer.getPlatformTarget("win32", "x64")).toMatchObject({
       assetName: "chatgpt2api-win32-x64.zip",
-      checksumName: "checksums-Windows.txt",
+      checksumName: "checksums-cli-Windows.txt",
       binaryName: "chatgpt2api.exe",
     });
     expect(() => installer.getPlatformTarget("linux", "arm64")).toThrow(/Unsupported platform/);

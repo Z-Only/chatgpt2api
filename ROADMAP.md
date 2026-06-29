@@ -2,11 +2,9 @@
 
 ## Now
 
-- Build the Rust core server.
 - Implement ChatGPT/Codex login.
-- Support OpenAI-compatible APIs.
-- Support ChatGPT image generation and editing.
-- Ship GUI and CLI entrypoints.
+- Wire authenticated upstream clients into GUI and CLI runtime.
+- Harden streaming/tool-call compatibility against fake upstream E2E.
 
 ## Next
 

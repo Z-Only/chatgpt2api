@@ -14,8 +14,14 @@ pub enum AppError {
     #[error("invalid config: {0}")]
     InvalidConfig(String),
 
+    #[error("invalid request: {0}")]
+    InvalidRequest(String),
+
     #[error("auth error: {0}")]
     Auth(String),
+
+    #[error("JSON error: {0}")]
+    Json(#[from] serde_json::Error),
 
     #[error("HTTP error: {0}")]
     Http(#[from] reqwest::Error),

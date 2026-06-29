@@ -6,6 +6,10 @@ pub mod models;
 pub mod oauth;
 pub mod rate_limits;
 pub mod reasoning;
+pub mod session;
+pub mod sse;
+pub mod tools;
+pub mod transform;
 pub mod upstream;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

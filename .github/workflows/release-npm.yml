@@ -1,0 +1,121 @@
+name: Release npm CLI
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish, for example v0.1.0
+        required: true
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
+jobs:
+  build-cli:
+    name: Build CLI ${{ matrix.asset_os }}-${{ matrix.asset_arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-15-intel
+            rust_target: x86_64-apple-darwin
+            asset_os: darwin
+            asset_arch: x64
+            archive: tar
+          - platform: macos-15
+            rust_target: aarch64-apple-darwin
+            asset_os: darwin
+            asset_arch: arm64
+            archive: tar
+          - platform: ubuntu-22.04
+            rust_target: x86_64-unknown-linux-gnu
+            asset_os: linux
+            asset_arch: x64
+            archive: tar
+          - platform: windows-latest
+            rust_target: x86_64-pc-windows-msvc
+            asset_os: win32
+            asset_arch: x64
+            archive: zip
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.rust_target }}
+      - name: Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+      - name: Build CLI
+        shell: bash
+        run: |
+          cargo build --manifest-path src-tauri/Cargo.toml --release --target "${{ matrix.rust_target }}"
+      - name: Package CLI archive
+        shell: bash
+        run: |
+          mkdir -p dist payload
+          binary_dir="src-tauri/target/${{ matrix.rust_target }}/release"
+          asset="chatgpt2api-${{ matrix.asset_os }}-${{ matrix.asset_arch }}"
+          if [ "${{ matrix.asset_os }}" = "win32" ]; then
+            cp "${binary_dir}/chatgpt2api.exe" payload/chatgpt2api.exe
+            (cd payload && 7z a "../dist/${asset}.zip" chatgpt2api.exe)
+          else
+            cp "${binary_dir}/chatgpt2api" payload/chatgpt2api
+            tar -czf "dist/${asset}.tar.gz" -C payload chatgpt2api
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.asset_os }}-${{ matrix.asset_arch }}
+          path: dist/*
+
+  release-assets:
+    name: Publish CLI release assets
+    runs-on: ubuntu-22.04
+    needs: build-cli
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+      - name: Checksums
+        shell: bash
+        run: |
+          cd release
+          sha256sum chatgpt2api-darwin-*.tar.gz > checksums-macOS.txt
+          sha256sum chatgpt2api-linux-*.tar.gz > checksums-Linux.txt
+          sha256sum chatgpt2api-win32-*.zip > checksums-Windows.txt
+      - name: Publish GitHub release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: release/*
+
+  publish-npm:
+    name: Publish npm package
+    runs-on: ubuntu-22.04
+    needs: release-assets
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Publish
+        working-directory: npm/chatgpt2api
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          version="${RELEASE_TAG#v}"
+          npm version "$version" --no-git-tag-version --allow-same-version
+          npm pkg set "chatgpt2api.releaseRepository=${GITHUB_REPOSITORY}"
+          npm publish --access public --provenance

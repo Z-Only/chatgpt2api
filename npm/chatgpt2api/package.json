@@ -1,0 +1,29 @@
+{
+  "name": "chatgpt2api",
+  "version": "0.1.0",
+  "description": "Local OpenAI-compatible API bridge for ChatGPT/Codex",
+  "license": "MIT",
+  "bin": {
+    "chatgpt2api": "bin/chatgpt2api.js"
+  },
+  "files": [
+    "bin",
+    "scripts",
+    "README.md"
+  ],
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "scripts": {
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "chatgpt2api": {
+    "releaseRepository": "chatgpt2api/chatgpt2api"
+  }
+}

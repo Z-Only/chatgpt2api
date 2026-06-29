@@ -1,3 +1,4 @@
+pub mod api;
 pub mod app_state;
 pub mod auth;
 pub mod config;
@@ -6,6 +7,7 @@ pub mod models;
 pub mod oauth;
 pub mod rate_limits;
 pub mod reasoning;
+pub mod server;
 pub mod session;
 pub mod sse;
 pub mod tools;

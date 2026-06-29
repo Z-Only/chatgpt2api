@@ -4,7 +4,9 @@ pub mod config;
 pub mod error;
 pub mod models;
 pub mod oauth;
+pub mod rate_limits;
 pub mod reasoning;
+pub mod upstream;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

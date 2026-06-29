@@ -16,4 +16,10 @@ pub enum AppError {
 
     #[error("auth error: {0}")]
     Auth(String),
+
+    #[error("HTTP error: {0}")]
+    Http(#[from] reqwest::Error),
+
+    #[error("upstream error: {0}")]
+    Upstream(String),
 }

@@ -1,0 +1,10 @@
+{
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "rules": {
+    "no-debugger": "error",
+    "no-console": "warn"
+  }
+}

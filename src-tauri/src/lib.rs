@@ -1,6 +1,8 @@
 pub mod app_state;
 pub mod config;
 pub mod error;
+pub mod models;
+pub mod reasoning;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

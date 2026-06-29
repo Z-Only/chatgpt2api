@@ -30,6 +30,15 @@ chatgpt2api --help
 chatgpt2api serve --port 14550
 ```
 
+Install the packaged CLI with Homebrew:
+
+```bash
+OWNER="$(gh repo view --json owner -q .owner.login)"
+brew tap "$OWNER/chatgpt2api"
+brew install chatgpt2api
+chatgpt2api serve
+```
+
 ## Endpoints
 
 - `GET /v1/models`
@@ -75,4 +84,4 @@ Custom port options:
 
 Desktop release workflow targets macOS DMG, Windows MSI/NSIS, and Linux AppImage/deb/rpm.
 
-CLI distribution supports npm package installs and direct GitHub release binary archives. Homebrew is planned in the distribution milestones.
+CLI distribution supports npm package installs, Homebrew installs, and direct GitHub release binary archives.

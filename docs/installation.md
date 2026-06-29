@@ -25,8 +25,17 @@ Release workflows produce:
 
 ## CLI Releases
 
-Planned CLI install methods:
+CLI install methods:
 
 - npm: `npm install -g chatgpt2api`
-- Homebrew: `brew install chatgpt2api`
+- Homebrew:
+
+```bash
+OWNER="$(gh repo view --json owner -q .owner.login)"
+brew tap "$OWNER/chatgpt2api"
+brew install chatgpt2api
+chatgpt2api login
+chatgpt2api serve
+```
+
 - GitHub release binary archives

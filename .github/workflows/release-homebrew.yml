@@ -1,0 +1,75 @@
+name: Release Homebrew
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish, for example v0.1.0
+        required: true
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+env:
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
+jobs:
+  update-tap:
+    name: Update Homebrew tap
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Download CLI release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p release
+          for attempt in $(seq 1 30); do
+            rm -f release/*
+            if gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir release --pattern "chatgpt2api-darwin-arm64.tar.gz" &&
+              gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir release --pattern "chatgpt2api-darwin-x64.tar.gz" &&
+              gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir release --pattern "chatgpt2api-linux-x64.tar.gz"; then
+              exit 0
+            fi
+            echo "Waiting for CLI release assets for $RELEASE_TAG (attempt ${attempt}/30)."
+            sleep 20
+          done
+          echo "CLI release assets were not available for $RELEASE_TAG." >&2
+          exit 1
+      - name: Compute formula checksums
+        run: |
+          {
+            echo "CHATGPT2API_DARWIN_ARM64_SHA256=$(sha256sum release/chatgpt2api-darwin-arm64.tar.gz | awk '{print $1}')"
+            echo "CHATGPT2API_DARWIN_X64_SHA256=$(sha256sum release/chatgpt2api-darwin-x64.tar.gz | awk '{print $1}')"
+            echo "CHATGPT2API_LINUX_X64_SHA256=$(sha256sum release/chatgpt2api-linux-x64.tar.gz | awk '{print $1}')"
+          } >> "$GITHUB_ENV"
+      - name: Generate formula
+        env:
+          RELEASE_VERSION: ${{ env.RELEASE_TAG }}
+        run: bun packaging/homebrew/generate-formula.ts
+      - name: Checkout Homebrew tap
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/homebrew-chatgpt2api
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: tap
+      - name: Push formula
+        run: |
+          mkdir -p tap/Formula
+          cp packaging/homebrew/chatgpt2api.rb tap/Formula/chatgpt2api.rb
+          cd tap
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- Formula/chatgpt2api.rb; then
+            echo "Homebrew formula is already current."
+            exit 0
+          fi
+          git add Formula/chatgpt2api.rb
+          git commit -m "chatgpt2api ${RELEASE_TAG}"
+          git push

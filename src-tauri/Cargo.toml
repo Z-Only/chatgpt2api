@@ -26,7 +26,12 @@ tauri-plugin-log = "2"
 tauri-plugin-pilot = { git = "https://github.com/mpiton/tauri-pilot", tag = "v0.7.2", optional = true }
 tokio = { version = "1.52.3", features = ["full"] }
 axum = { version = "0.8.4", features = ["multipart", "ws"] }
-reqwest = { version = "0.13.3", default-features = false, features = ["json", "multipart", "stream", "rustls"] }
+reqwest = { version = "0.13.3", default-features = false, features = [
+  "json",
+  "multipart",
+  "stream",
+  "rustls",
+] }
 toml = "1.0.7"
 thiserror = "2.0.18"
 tracing = "0.1.44"
@@ -40,11 +45,7 @@ chrono = "0.4.45"
 futures-util = "0.3.32"
 tokio-tungstenite = "0.29.0"
 getrandom = "0.3"
-keyring = { version = "3", features = [
-  "apple-native",
-  "windows-native",
-  "linux-native",
-] }
+keyring = { version = "3", features = ["apple-native", "windows-native", "linux-native"] }
 
 [features]
 pilot = ["dep:tauri-plugin-pilot"]

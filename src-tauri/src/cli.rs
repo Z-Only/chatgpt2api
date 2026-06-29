@@ -4,11 +4,13 @@ use std::path::Path;
 use clap::{error::ErrorKind, Parser, Subcommand};
 
 use crate::{
+    api::ApiState,
     config::{AppConfig, RuntimeOverrides},
     error::{AppError, AppResult},
     image::image_model_list,
     models::ModelRegistry,
     server,
+    upstream::UpstreamClient,
 };
 
 #[derive(Debug, Parser)]
@@ -128,7 +130,11 @@ async fn serve(
             sets: parse_sets(sets)?,
         },
     )?;
-    let handle = server::spawn(config).await?;
+    let handle = if let Some(state) = fake_upstream_state(config.clone())? {
+        server::spawn_with_state(state).await?
+    } else {
+        server::spawn(config).await?
+    };
     let url = format!("http://{}", handle.addr());
     tokio::signal::ctrl_c().await?;
     handle.stop();
@@ -144,4 +150,18 @@ fn parse_sets(sets: Vec<String>) -> AppResult<Vec<(String, String)>> {
             Ok((key.to_string(), value.to_string()))
         })
         .collect()
+}
+
+fn fake_upstream_state(config: AppConfig) -> AppResult<Option<ApiState>> {
+    let Ok(base_url) = std::env::var("CHATGPT2API_FAKE_UPSTREAM_BASE_URL") else {
+        return Ok(None);
+    };
+
+    // ponytail: E2E-only fake upstream hook; replace with auth-built upstream clients when login is wired.
+    let upstream = UpstreamClient::new(base_url, "e2e-token", "e2e-session", "e2e-install")?;
+    let mut state = ApiState::with_upstream(config, upstream);
+    if let Ok(ws_url) = std::env::var("CHATGPT2API_FAKE_UPSTREAM_WS_URL") {
+        state = state.with_responses_ws_url(ws_url);
+    }
+    Ok(Some(state))
 }

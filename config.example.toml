@@ -1,0 +1,34 @@
+[server]
+host = "127.0.0.1"
+port = 14550
+login_callback_port = 1455
+allow_external_bind = false
+
+[api]
+default_model = "gpt-5.5"
+expose_reasoning_models = true
+
+[reasoning]
+effort = "medium"
+summary = "auto"
+compat = "hidden"
+
+[text]
+verbosity = "medium"
+
+[image]
+default_model = "chatgpt-image-latest"
+size = "auto"
+quality = "auto"
+background = "auto"
+output_format = "png"
+
+[features]
+fast_mode = false
+enable_web_search = true
+enable_image_api = true
+enable_responses_websocket = true
+
+[ui]
+locale = "system"
+theme = "system"

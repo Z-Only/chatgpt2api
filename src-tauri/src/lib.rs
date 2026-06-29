@@ -1,3 +1,7 @@
+pub mod app_state;
+pub mod config;
+pub mod error;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg_attr(not(all(debug_assertions, feature = "pilot")), allow(unused_mut))]

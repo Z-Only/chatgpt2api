@@ -16,29 +16,41 @@
     "tauri": "tauri",
     "prepare": "husky"
   },
+  "dependencies": {
+    "pinia": "^3.0.4",
+    "reka-ui": "^2.10.1",
+    "vue": "^3.5.39",
+    "vue-i18n": "11.1.12",
+    "vue-router": "^5.1.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "latest",
     "@commitlint/config-conventional": "latest",
-    "@vitejs/plugin-vue": "latest",
+    "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/cli": "^2.11.4",
+    "@vitejs/plugin-vue": "^6.0.7",
     "husky": "latest",
     "lint-staged": "latest",
     "oxfmt": "latest",
     "oxlint": "latest",
+    "postcss-html": "^1.8.1",
     "stylelint": "latest",
     "stylelint-config-standard": "latest",
-    "typescript": "latest",
-    "vite": "latest",
-    "vitest": "latest",
-    "vue-tsc": "latest"
+    "typescript": "^6.0.3",
+    "vite": "^8.1.0",
+    "vitest": "^4.1.9",
+    "vue-tsc": "^3.3.5"
   },
   "lint-staged": {
-    "*.{ts,tsx,vue,js,json,css,md}": [
+    "*.{ts,tsx,vue,js,json,md}": [
       "oxfmt --write",
-      "oxlint --fix",
+      "oxlint --fix"
+    ],
+    "*.{css,vue}": [
       "stylelint --fix --allow-empty-input"
     ],
     "src-tauri/src/**/*.rs": [
-      "cargo fmt --manifest-path src-tauri/Cargo.toml"
+      "bash -c 'cargo fmt --manifest-path src-tauri/Cargo.toml'"
     ]
   }
 }

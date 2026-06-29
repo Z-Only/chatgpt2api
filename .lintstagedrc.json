@@ -1,8 +1,5 @@
 {
-  "*.{ts,tsx,vue,js,json,css,md}": [
-    "oxfmt --write",
-    "oxlint --fix",
-    "stylelint --fix --allow-empty-input"
-  ],
-  "src-tauri/src/**/*.rs": ["cargo fmt --manifest-path src-tauri/Cargo.toml"]
+  "*.{ts,tsx,vue,js,json,md}": ["oxfmt --write", "oxlint --fix"],
+  "*.{css,vue}": ["stylelint --fix --allow-empty-input"],
+  "src-tauri/src/**/*.rs": ["bash -c 'cargo fmt --manifest-path src-tauri/Cargo.toml'"]
 }

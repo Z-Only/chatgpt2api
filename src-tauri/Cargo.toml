@@ -1,0 +1,40 @@
+[package]
+name = "chatgpt2api"
+version = "0.1.0"
+description = "Local OpenAI-compatible API bridge for ChatGPT/Codex"
+authors = ["ChatGPT2API Contributors"]
+license = ""
+repository = ""
+edition = "2021"
+rust-version = "1.85.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "chatgpt2api"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.6.3", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+log = "0.4"
+tauri = { version = "2.11.3", features = [] }
+tauri-plugin-log = "2"
+tokio = { version = "1.52.3", features = ["full"] }
+axum = "0.8.4"
+reqwest = { version = "0.13.3", default-features = false, features = ["json", "stream", "rustls"] }
+toml = "1.0.7"
+thiserror = "2.0.18"
+tracing = "0.1.44"
+tracing-subscriber = "0.3.23"
+tower-http = "0.7.0"
+uuid = "1.20.0"
+sha2 = "0.10.9"
+base64 = "0.22.1"
+url = "2.5.8"
+chrono = "0.4.45"
+futures-util = "0.3.32"
+tokio-tungstenite = "0.29.0"

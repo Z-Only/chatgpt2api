@@ -15,7 +15,10 @@ use tokio::{net::TcpListener, sync::oneshot};
 use url::Url;
 
 use crate::{
-    api::health::{health, root},
+    api::{
+        health::{health, root},
+        images, openai, ApiState,
+    },
     config::AppConfig,
     error::{AppError, AppResult},
 };
@@ -37,12 +40,16 @@ impl ServerHandle {
 }
 
 pub async fn spawn(config: AppConfig) -> AppResult<ServerHandle> {
-    let listener = TcpListener::bind(socket_addr(&config)?).await?;
+    spawn_with_state(ApiState::new(config)).await
+}
+
+pub async fn spawn_with_state(state: ApiState) -> AppResult<ServerHandle> {
+    let listener = TcpListener::bind(socket_addr(&state.config)?).await?;
     let addr = listener.local_addr()?;
     let (shutdown, shutdown_rx) = oneshot::channel();
 
     tokio::spawn(async move {
-        if let Err(error) = axum::serve(listener, router())
+        if let Err(error) = axum::serve(listener, router_with_state(state))
             .with_graceful_shutdown(async {
                 let _ = shutdown_rx.await;
             })
@@ -56,10 +63,17 @@ pub async fn spawn(config: AppConfig) -> AppResult<ServerHandle> {
 }
 
 pub fn router() -> Router {
+    router_with_state(ApiState::new(AppConfig::default()))
+}
+
+pub fn router_with_state(state: ApiState) -> Router {
     Router::new()
         .route("/", get(root))
         .route("/health", get(health))
+        .merge(openai::routes())
+        .merge(images::routes())
         .layer(middleware::from_fn(local_cors))
+        .with_state(state)
 }
 
 pub fn socket_addr(config: &AppConfig) -> AppResult<SocketAddr> {

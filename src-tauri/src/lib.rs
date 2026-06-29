@@ -3,6 +3,7 @@ pub mod app_state;
 pub mod auth;
 pub mod config;
 pub mod error;
+pub mod image;
 pub mod models;
 pub mod oauth;
 pub mod rate_limits;

@@ -13,6 +13,8 @@
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "typecheck": "vue-tsc --noEmit",
+    "cli:dev": "cargo run --manifest-path src-tauri/Cargo.toml --",
+    "cli:build": "cargo build --manifest-path src-tauri/Cargo.toml --release",
     "tauri": "tauri",
     "tauri:pilot": "tauri-pilot",
     "tauri:pilot:install": "cargo install tauri-pilot-cli --version 0.7.2 --locked",

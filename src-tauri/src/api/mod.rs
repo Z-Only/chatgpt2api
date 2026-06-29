@@ -1,6 +1,7 @@
 pub mod health;
 pub mod images;
 pub mod openai;
+pub mod responses_ws;
 
 use axum::{
     http::StatusCode,
@@ -15,6 +16,7 @@ use crate::{config::AppConfig, error::AppError, upstream::UpstreamClient};
 pub struct ApiState {
     pub config: AppConfig,
     pub upstream: Option<UpstreamClient>,
+    pub responses_ws_url: Option<String>,
 }
 
 impl ApiState {
@@ -22,6 +24,7 @@ impl ApiState {
         Self {
             config,
             upstream: None,
+            responses_ws_url: None,
         }
     }
 
@@ -29,7 +32,13 @@ impl ApiState {
         Self {
             config,
             upstream: Some(upstream),
+            responses_ws_url: None,
         }
+    }
+
+    pub fn with_responses_ws_url(mut self, url: impl Into<String>) -> Self {
+        self.responses_ws_url = Some(url.into());
+        self
     }
 
     pub fn upstream(&self) -> Result<UpstreamClient, ApiError> {

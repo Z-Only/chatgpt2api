@@ -17,7 +17,7 @@ use url::Url;
 use crate::{
     api::{
         health::{health, root},
-        images, openai, ApiState,
+        images, openai, responses_ws, ApiState,
     },
     config::AppConfig,
     error::{AppError, AppResult},
@@ -72,6 +72,7 @@ pub fn router_with_state(state: ApiState) -> Router {
         .route("/health", get(health))
         .merge(openai::routes())
         .merge(images::routes())
+        .merge(responses_ws::routes())
         .layer(middleware::from_fn(local_cors))
         .with_state(state)
 }

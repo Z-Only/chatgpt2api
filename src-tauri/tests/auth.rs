@@ -2,7 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
-use chatgpt2api::auth::{AuthTokens, TokenStore};
+use chatgpt2api::auth::{load_local_chatgpt_credentials_from_path, AuthTokens, TokenStore};
 use chatgpt2api::oauth::{parse_jwt_claims, pkce_challenge, BrowserCallbackServer};
 use chrono::{Duration, TimeZone, Utc};
 
@@ -93,4 +93,34 @@ fn auth_memory_token_store_does_not_write_refresh_tokens_to_disk() {
         Some("refresh-secret")
     );
     assert!(fs::read_dir(&dir).unwrap().next().is_none());
+}
+
+#[test]
+fn auth_loads_local_codex_credentials() {
+    let path = temp_path("codex-auth-file");
+    let exp = Utc::now().timestamp() + 3600;
+    let access_token = jwt_with_payload(&format!(r#"{{"sub":"user-123","exp":{exp}}}"#));
+    let id_token = jwt_with_payload(&format!(
+        r#"{{"sub":"user-123","email":"user@example.com","exp":{exp}}}"#
+    ));
+    fs::write(
+        &path,
+        format!(
+            r#"{{
+  "tokens": {{
+    "access_token": "{access_token}",
+    "refresh_token": "refresh-token",
+    "id_token": "{id_token}",
+    "account_id": "account-123"
+  }}
+}}"#
+        ),
+    )
+    .unwrap();
+
+    let credentials = load_local_chatgpt_credentials_from_path(&path).unwrap();
+
+    assert_eq!(credentials.email.as_deref(), Some("user@example.com"));
+    assert_eq!(credentials.account_id.as_deref(), Some("account-123"));
+    assert_eq!(credentials.refresh_token.as_deref(), Some("refresh-token"));
 }

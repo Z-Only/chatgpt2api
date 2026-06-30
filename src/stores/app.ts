@@ -33,7 +33,7 @@ export const useAppStore = defineStore("app", {
   state: (): AppStoreState => {
     const config = defaultConfig();
     return {
-      account: { logged_in: false, email: null },
+      account: { logged_in: false, email: null, account_id: null, expires_at: null },
       config,
       server: defaultServerStatus(config),
       configPath: "",

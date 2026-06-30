@@ -26,4 +26,7 @@ export default defineConfig({
     minify: !process.env.TAURI_ENV_DEBUG ? "esbuild" : false,
     sourcemap: Boolean(process.env.TAURI_ENV_DEBUG),
   },
+  test: {
+    exclude: ["**/node_modules/**", "**/dist/**", "**/.agents/**"],
+  },
 });

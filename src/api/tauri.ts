@@ -13,6 +13,7 @@ export interface AppConfig {
   api: {
     default_model: string;
     expose_reasoning_models: boolean;
+    upstream_base_url: string;
   };
   reasoning: {
     effort: string;
@@ -52,6 +53,8 @@ export interface ServerStatus {
 export interface AccountInfo {
   logged_in: boolean;
   email: string | null;
+  account_id: string | null;
+  expires_at: string | null;
 }
 
 export interface ImageCommandRequest {
@@ -79,6 +82,7 @@ export function defaultConfig(): AppConfig {
     api: {
       default_model: "gpt-5.5",
       expose_reasoning_models: true,
+      upstream_base_url: "https://chatgpt.com/backend-api/codex/",
     },
     reasoning: {
       effort: "medium",

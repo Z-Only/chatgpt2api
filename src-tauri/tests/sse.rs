@@ -1,4 +1,33 @@
-use chatgpt2api::{config::AppConfig, sse::responses_sse_to_chat_sse};
+use chatgpt2api::{
+    config::AppConfig,
+    sse::{responses_sse_to_chat_sse, responses_sse_to_response_json},
+};
+
+#[test]
+fn sse_collapses_completed_response_to_json() {
+    let response = responses_sse_to_response_json(
+        "data: {\"type\":\"response.output_text.delta\",\"delta\":\"pong\"}\n\
+         \n\
+         data: {\"type\":\"response.completed\",\"response\":{\"id\":\"resp_1\",\"output\":[{\"type\":\"message\",\"content\":[{\"type\":\"output_text\",\"text\":\"pong\"}]}]}}\n\n",
+    )
+    .unwrap();
+
+    assert_eq!(response["id"], "resp_1");
+    assert_eq!(response["output"][0]["content"][0]["text"], "pong");
+}
+
+#[test]
+fn sse_fills_empty_completed_response_from_done_item() {
+    let response = responses_sse_to_response_json(
+        "data: {\"type\":\"response.output_item.done\",\"item\":{\"content\":[{\"type\":\"output_text\",\"text\":\"pong\"}]}}\n\
+         \n\
+         data: {\"type\":\"response.completed\",\"response\":{\"id\":\"resp_1\",\"output\":[]}}\n\n",
+    )
+    .unwrap();
+
+    assert_eq!(response["id"], "resp_1");
+    assert_eq!(response["output"][0]["content"][0]["text"], "pong");
+}
 
 #[test]
 fn sse_translates_responses_deltas_to_openai_chat_chunks() {

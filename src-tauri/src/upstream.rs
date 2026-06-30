@@ -11,6 +11,7 @@ use serde_json::Value;
 use crate::{
     error::{AppError, AppResult},
     rate_limits::{parse_usage_limit_headers, UsageLimit},
+    sse::responses_sse_to_response_json,
 };
 
 type RefreshFn =
@@ -167,9 +168,24 @@ impl UpstreamClient {
         &self,
         response: reqwest::Response,
     ) -> AppResult<UpstreamJsonResponse> {
-        let response = ensure_success(response)?;
+        let response = ensure_success(response).await?;
         let rate_limits = parse_usage_limit_headers(response.headers());
-        let body = response.json().await?;
+        let is_sse = response
+            .headers()
+            .get(reqwest::header::CONTENT_TYPE)
+            .and_then(|value| value.to_str().ok())
+            .is_some_and(|value| value.starts_with("text/event-stream"));
+        let text = response.text().await?;
+        let body = if is_sse || text.lines().any(|line| line.trim().starts_with("data:")) {
+            responses_sse_to_response_json(&text)?
+        } else {
+            serde_json::from_str(&text).map_err(|error| {
+                AppError::Upstream(format!(
+                    "upstream returned non-JSON body: {error}: {}",
+                    text.chars().take(500).collect::<String>()
+                ))
+            })?
+        };
 
         Ok(UpstreamJsonResponse { body, rate_limits })
     }
@@ -262,13 +278,17 @@ fn normalize_base_url(base_url: &str) -> AppResult<Url> {
         .map_err(|error| AppError::Upstream(format!("invalid upstream base URL: {error}")))
 }
 
-fn ensure_success(response: reqwest::Response) -> AppResult<reqwest::Response> {
+async fn ensure_success(response: reqwest::Response) -> AppResult<reqwest::Response> {
     let status = response.status();
     if status.is_success() {
         return Ok(response);
     }
 
-    Err(AppError::Upstream(format!("upstream returned {status}")))
+    let body = response.text().await.unwrap_or_default();
+    let body = body.chars().take(500).collect::<String>();
+    Err(AppError::Upstream(format!(
+        "upstream returned {status}: {body}"
+    )))
 }
 
 fn extract_image_outputs(body: &Value) -> Vec<ImageOutput> {

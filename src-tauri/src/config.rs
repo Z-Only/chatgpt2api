@@ -32,6 +32,7 @@ pub struct ServerConfig {
 pub struct ApiConfig {
     pub default_model: String,
     pub expose_reasoning_models: bool,
+    pub upstream_base_url: String,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -98,6 +99,7 @@ impl Default for ApiConfig {
         Self {
             default_model: "gpt-5.5".to_string(),
             expose_reasoning_models: true,
+            upstream_base_url: "https://chatgpt.com/backend-api/codex/".to_string(),
         }
     }
 }
@@ -247,6 +249,7 @@ impl AppConfig {
                 self.server.allow_external_bind = parse_bool(value, key)?
             }
             "api.default_model" => self.api.default_model = value.to_string(),
+            "api.upstream_base_url" => self.api.upstream_base_url = value.to_string(),
             "api.expose_reasoning_models" => {
                 self.api.expose_reasoning_models = parse_bool(value, key)?;
             }

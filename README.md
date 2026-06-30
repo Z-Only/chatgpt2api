@@ -78,6 +78,7 @@ Custom port options:
 - Local-only bind by default.
 - No wildcard CORS by default.
 - Config stores non-secret settings only.
+- Login reads local Codex/ChatGPT credentials from `~/.codex/auth.json`; tokens stay in memory.
 - Refresh tokens should use the OS keychain; memory-only fallback does not persist tokens.
 
 ## Packaging

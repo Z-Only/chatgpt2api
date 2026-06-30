@@ -33,6 +33,8 @@ pub fn chat_to_responses(request: &Value, config: &AppConfig) -> AppResult<Value
         "input": convert_messages(messages)?,
         "reasoning": {"effort": effort},
         "text": {"verbosity": verbosity},
+        "stream": true,
+        "store": false,
     });
     if let Some(summary) = summary {
         response["reasoning"]["summary"] = json!(summary);

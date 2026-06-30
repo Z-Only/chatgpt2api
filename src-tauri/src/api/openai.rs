@@ -127,6 +127,17 @@ pub fn normalize_responses_request(
         "verbosity",
         json!(config.text.verbosity),
     );
+    if let Some(input) = object.get("input").cloned().filter(Value::is_string) {
+        object.insert(
+            "input".to_string(),
+            json!([{
+                "role": "user",
+                "content": [{"type": "input_text", "text": input.as_str().unwrap_or_default()}],
+            }]),
+        );
+    }
+    object.insert("store".to_string(), json!(false));
+    object.insert("stream".to_string(), json!(true));
 
     Ok(Value::Object(object))
 }

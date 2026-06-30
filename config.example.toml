@@ -7,6 +7,7 @@ allow_external_bind = false
 [api]
 default_model = "gpt-5.5"
 expose_reasoning_models = true
+upstream_base_url = "https://chatgpt.com/backend-api/codex/"
 
 [reasoning]
 effort = "medium"

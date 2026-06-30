@@ -5,6 +5,7 @@ use clap::{error::ErrorKind, Parser, Subcommand};
 
 use crate::{
     api::ApiState,
+    auth::load_local_chatgpt_credentials,
     config::{AppConfig, RuntimeOverrides},
     error::{AppError, AppResult},
     image::image_model_list,
@@ -80,12 +81,13 @@ where
     };
 
     match cli.command {
-        Command::Login { headless } => {
-            if headless {
-                Ok("device login is not implemented yet".to_string())
-            } else {
-                Ok("browser login is not implemented yet".to_string())
-            }
+        Command::Login { headless: _ } => {
+            let credentials = load_local_chatgpt_credentials()?;
+            let account = credentials
+                .email
+                .or(credentials.account_id)
+                .unwrap_or_else(|| "local ChatGPT account".to_string());
+            Ok(format!("logged in {account}"))
         }
         Command::Logout => Ok("logged out".to_string()),
         Command::Serve { host, port, sets } => serve(path, host, port, sets).await,
@@ -132,6 +134,9 @@ async fn serve(
     )?;
     let handle = if let Some(state) = fake_upstream_state(config.clone())? {
         server::spawn_with_state(state).await?
+    } else if let Ok(credentials) = load_local_chatgpt_credentials() {
+        let upstream = credentials.upstream_client(&config.api.upstream_base_url)?;
+        server::spawn_with_state(ApiState::with_upstream(config, upstream)).await?
     } else {
         server::spawn(config).await?
     };

@@ -10,6 +10,8 @@ use crate::{
 pub struct AccountInfo {
     pub logged_in: bool,
     pub email: Option<String>,
+    pub account_id: Option<String>,
+    pub expires_at: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -34,8 +36,11 @@ pub struct ImageCommandResponse {
 }
 
 #[tauri::command]
-pub async fn login_browser() -> Result<AccountInfo, String> {
-    Ok(logged_out_account())
+pub async fn login_browser(state: State<'_, AppState>) -> Result<AccountInfo, String> {
+    state
+        .login_local_credentials()
+        .map(credentials_account_info)
+        .map_err(to_message)
 }
 
 #[tauri::command]
@@ -44,8 +49,11 @@ pub async fn logout() -> Result<AccountInfo, String> {
 }
 
 #[tauri::command]
-pub async fn account_info() -> Result<AccountInfo, String> {
-    Ok(logged_out_account())
+pub async fn account_info(state: State<'_, AppState>) -> Result<AccountInfo, String> {
+    Ok(state
+        .credentials()
+        .map(credentials_account_info)
+        .unwrap_or_else(logged_out_account))
 }
 
 #[tauri::command]
@@ -114,6 +122,17 @@ fn logged_out_account() -> AccountInfo {
     AccountInfo {
         logged_in: false,
         email: None,
+        account_id: None,
+        expires_at: None,
+    }
+}
+
+fn credentials_account_info(credentials: crate::auth::LocalChatGptCredentials) -> AccountInfo {
+    AccountInfo {
+        logged_in: true,
+        email: credentials.email,
+        account_id: credentials.account_id,
+        expires_at: Some(credentials.expires_at.to_rfc3339()),
     }
 }
 

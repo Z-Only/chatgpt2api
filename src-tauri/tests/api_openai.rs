@@ -166,6 +166,10 @@ async fn api_responses_non_streaming_forwards_normalized_request() {
 
     assert_eq!(response["id"], "resp_1");
     assert_eq!(upstream_request["model"], "configured-model");
+    assert_eq!(upstream_request["input"][0]["role"], "user");
+    assert_eq!(upstream_request["input"][0]["content"][0]["text"], "hi");
+    assert_eq!(upstream_request["store"], false);
+    assert_eq!(upstream_request["stream"], true);
     assert_eq!(upstream_request["reasoning"]["effort"], "medium");
     assert_eq!(upstream_request["text"]["verbosity"], "medium");
     handle.stop();

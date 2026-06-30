@@ -4,6 +4,9 @@ use crate::{config::AppConfig, error::AppResult};
 
 pub fn responses_sse_to_response_json(input: &str) -> AppResult<Value> {
     let mut output_text = String::new();
+    let mut saw_output_text = false;
+    let mut content_part_text = String::new();
+    let mut output_item_text = String::new();
     let mut completed = None;
 
     for line in input.lines() {
@@ -20,21 +23,23 @@ pub fn responses_sse_to_response_json(input: &str) -> AppResult<Value> {
         match event.get("type").and_then(Value::as_str) {
             Some("response.output_text.delta") => {
                 if let Some(delta) = event.get("delta").and_then(Value::as_str) {
+                    saw_output_text = true;
                     output_text.push_str(delta);
                 }
             }
             Some("response.output_text.done") => {
                 if let Some(text) = event.get("text").and_then(Value::as_str) {
+                    saw_output_text = true;
                     output_text = text.to_string();
                 }
             }
             Some("response.content_part.done") => {
                 if let Some(text) = event.pointer("/part/text").and_then(Value::as_str) {
-                    output_text.push_str(text);
+                    content_part_text.push_str(text);
                 }
             }
             Some("response.output_item.done") => {
-                append_item_text(&mut output_text, event.get("item"));
+                append_item_text(&mut output_item_text, event.get("item"));
             }
             Some("response.completed") => {
                 completed = event.get("response").cloned();
@@ -43,24 +48,32 @@ pub fn responses_sse_to_response_json(input: &str) -> AppResult<Value> {
         }
     }
 
+    let collected_text = if saw_output_text {
+        output_text
+    } else if !content_part_text.is_empty() {
+        content_part_text
+    } else {
+        output_item_text
+    };
+
     if let Some(response) = completed {
-        if output_text.is_empty()
-            || response
-                .get("output")
-                .and_then(Value::as_array)
-                .is_some_and(|output| !output.is_empty())
+        if response
+            .get("output")
+            .and_then(Value::as_array)
+            .is_some_and(|output| !output.is_empty())
+            || collected_text.is_empty()
         {
             return Ok(response);
         }
         let mut response = response;
-        response["output"] = output_from_text(&output_text);
+        response["output"] = output_from_text(&collected_text);
         return Ok(response);
     }
 
     Ok(json!({
         "id": "resp_stream",
         "object": "response",
-        "output": output_from_text(&output_text),
+        "output": output_from_text(&collected_text),
     }))
 }
 

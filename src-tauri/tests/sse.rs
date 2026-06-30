@@ -30,6 +30,25 @@ fn sse_fills_empty_completed_response_from_done_item() {
 }
 
 #[test]
+fn sse_does_not_duplicate_completed_text_from_done_events() {
+    let response = responses_sse_to_response_json(
+        "data: {\"type\":\"response.output_text.delta\",\"delta\":\"pong\"}\n\
+         \n\
+         data: {\"type\":\"response.output_text.done\",\"text\":\"pong\"}\n\
+         \n\
+         data: {\"type\":\"response.content_part.done\",\"part\":{\"text\":\"pong\"}}\n\
+         \n\
+         data: {\"type\":\"response.output_item.done\",\"item\":{\"content\":[{\"type\":\"output_text\",\"text\":\"pong\"}]}}\n\
+         \n\
+         data: {\"type\":\"response.completed\",\"response\":{\"id\":\"resp_1\",\"output\":[]}}\n\n",
+    )
+    .unwrap();
+
+    assert_eq!(response["id"], "resp_1");
+    assert_eq!(response["output"][0]["content"][0]["text"], "pong");
+}
+
+#[test]
 fn sse_translates_responses_deltas_to_openai_chat_chunks() {
     let config = AppConfig::default();
     let chunks = responses_sse_to_chat_sse(

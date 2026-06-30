@@ -32,6 +32,7 @@ pub struct ServerConfig {
 pub struct ApiConfig {
     pub default_model: String,
     pub expose_reasoning_models: bool,
+    #[serde(default = "default_upstream_base_url")]
     pub upstream_base_url: String,
 }
 
@@ -99,9 +100,13 @@ impl Default for ApiConfig {
         Self {
             default_model: "gpt-5.5".to_string(),
             expose_reasoning_models: true,
-            upstream_base_url: "https://chatgpt.com/backend-api/codex/".to_string(),
+            upstream_base_url: default_upstream_base_url(),
         }
     }
+}
+
+fn default_upstream_base_url() -> String {
+    "https://chatgpt.com/backend-api/codex/".to_string()
 }
 
 impl Default for ReasoningConfig {

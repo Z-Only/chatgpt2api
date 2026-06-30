@@ -32,6 +32,24 @@ fn transform_converts_chat_image_input_to_responses_input() {
 }
 
 #[test]
+fn transform_marks_assistant_history_as_output_text() {
+    let response = chat_to_responses(
+        &json!({
+            "messages": [
+                {"role": "user", "content": "remember value-1"},
+                {"role": "assistant", "content": "remembered value-1"},
+                {"role": "user", "content": "what did I ask you to remember?"}
+            ]
+        }),
+        &AppConfig::default(),
+    )
+    .unwrap();
+
+    assert_eq!(response["input"][0]["content"][0]["type"], "input_text");
+    assert_eq!(response["input"][1]["content"][0]["type"], "output_text");
+}
+
+#[test]
 fn transform_maps_generated_image_output_to_openai_image_response() {
     let response = responses_image_output_to_openai_image_response(&json!({
         "output": [{"type": "image_generation_call", "result": "base64-image"}]

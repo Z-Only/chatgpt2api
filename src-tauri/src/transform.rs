@@ -108,17 +108,23 @@ fn convert_messages(messages: &[Value]) -> AppResult<Vec<Value>> {
     messages
         .iter()
         .map(|message| {
+            let role = string_field(message, "role")?;
             Ok(json!({
-                "role": string_field(message, "role")?,
-                "content": convert_content(message.get("content").ok_or_else(|| invalid_request("message content is required"))?)?,
+                "role": role,
+                "content": convert_content(role, message.get("content").ok_or_else(|| invalid_request("message content is required"))?)?,
             }))
         })
         .collect()
 }
 
-fn convert_content(content: &Value) -> AppResult<Vec<Value>> {
+fn convert_content(role: &str, content: &Value) -> AppResult<Vec<Value>> {
+    let text_type = if role == "assistant" {
+        "output_text"
+    } else {
+        "input_text"
+    };
     if let Some(text) = content.as_str() {
-        return Ok(vec![json!({"type": "input_text", "text": text})]);
+        return Ok(vec![json!({"type": text_type, "text": text})]);
     }
 
     let parts = content
@@ -128,7 +134,7 @@ fn convert_content(content: &Value) -> AppResult<Vec<Value>> {
         .iter()
         .map(|part| match part.get("type").and_then(Value::as_str) {
             Some("text") => Ok(json!({
-                "type": "input_text",
+                "type": text_type,
                 "text": string_field(part, "text")?,
             })),
             Some("image_url") => Ok(json!({

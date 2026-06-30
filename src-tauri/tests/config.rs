@@ -83,7 +83,34 @@ fn config_example_parses() {
     let config = AppConfig::from_toml_str(&load_example()).unwrap();
 
     assert_eq!(config.server.port, 14550);
+    assert_eq!(
+        config.api.upstream_base_url,
+        "https://chatgpt.com/backend-api/codex/"
+    );
     assert_eq!(config.image.default_model, "chatgpt-image-latest");
+}
+
+#[test]
+fn config_missing_upstream_base_url_uses_default() {
+    let config = AppConfig::from_toml_str(
+        r#"
+[server]
+host = "127.0.0.1"
+port = 14550
+login_callback_port = 1455
+allow_external_bind = false
+
+[api]
+default_model = "gpt-5.5"
+expose_reasoning_models = true
+"#,
+    )
+    .unwrap();
+
+    assert_eq!(
+        config.api.upstream_base_url,
+        "https://chatgpt.com/backend-api/codex/"
+    );
 }
 
 #[test]

@@ -16,6 +16,7 @@
     </filter>
   </defs>
 
+  <g transform="translate(512 512) scale(0.82) translate(-512 -512)">
   <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
   <circle cx="812" cy="214" r="72" fill="#22c55e" opacity="0.2"/>
   <circle cx="206" cy="824" r="96" fill="#38bdf8" opacity="0.16"/>
@@ -29,4 +30,5 @@
   <path d="M512 204l44 92h102l-78 62 30 98-98-58-98 58 30-98-78-62h102l44-92Z" fill="#facc15"/>
   <path d="M362 792c42-42 92-62 150-62s108 20 150 62c-42 42-92 62-150 62s-108-20-150-62Z" fill="#f8fafc" opacity="0.94"/>
   <path d="M448 792h128" stroke="#2563eb" stroke-width="42" stroke-linecap="round"/>
+  </g>
 </svg>

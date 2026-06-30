@@ -9,7 +9,6 @@ const { t } = useI18n();
 <template>
   <section class="panel">
     <h2>{{ t("logs.title") }}</h2>
-    <p class="path">{{ app.configPath }}</p>
     <ul v-if="app.logs.length">
       <li v-for="entry in app.logs" :key="entry">{{ entry }}</li>
     </ul>
@@ -31,7 +30,6 @@ h2 {
   font-size: 1rem;
 }
 
-.path,
 .empty,
 li {
   color: var(--color-muted);

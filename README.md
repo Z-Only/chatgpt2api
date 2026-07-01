@@ -33,8 +33,7 @@ chatgpt2api serve --port 14550
 Install the packaged CLI with Homebrew:
 
 ```bash
-OWNER="$(gh repo view --json owner -q .owner.login)"
-brew tap "$OWNER/chatgpt2api"
+brew tap Z-Only/chatgpt2api
 brew install chatgpt2api
 chatgpt2api serve
 ```

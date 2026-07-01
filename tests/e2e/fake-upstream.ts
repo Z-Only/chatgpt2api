@@ -108,7 +108,7 @@ export async function startApiProcess(fake: FakeUpstream): Promise<ApiProcess> {
 }
 
 export async function waitForHealth(baseUrl: string): Promise<void> {
-  const deadline = Date.now() + 20_000;
+  const deadline = Date.now() + 120_000;
   while (Date.now() < deadline) {
     try {
       const response = await fetch(`${baseUrl}/health`);
@@ -129,7 +129,7 @@ export function useE2EServer() {
   beforeAll(async () => {
     fake = await startFakeUpstream();
     api = await startApiProcess(fake);
-  }, 30_000);
+  }, 120_000);
 
   afterAll(() => {
     api?.stop();

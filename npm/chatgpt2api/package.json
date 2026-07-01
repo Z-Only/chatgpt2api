@@ -24,6 +24,6 @@
     "postinstall": "node scripts/postinstall.js"
   },
   "chatgpt2api": {
-    "releaseRepository": "chatgpt2api/chatgpt2api"
+    "releaseRepository": "Z-Only/chatgpt2api"
   }
 }

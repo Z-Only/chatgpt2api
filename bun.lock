@@ -14,6 +14,7 @@
       "devDependencies": {
         "@commitlint/cli": "latest",
         "@commitlint/config-conventional": "latest",
+        "@intlify/devtools-types": "11.1.12",
         "@tauri-apps/api": "^2.11.1",
         "@tauri-apps/cli": "^2.11.4",
         "@vitejs/plugin-vue": "^6.0.7",
@@ -174,6 +175,8 @@
     "@internationalized/number": ["@internationalized/number@3.6.7", "https://registry.npmmirror.com/@internationalized/number/-/number-3.6.7.tgz", { "dependencies": { "@swc/helpers": "^0.5.0" } }, "sha512-3ji1fcrT+FPAK86UqEhB/psHixYo6niWPJtt7+qRaYFynt/BaJG8GhAPimtWUpEiVSTq8ZM8L5psMxGquiB/Vg=="],
 
     "@intlify/core-base": ["@intlify/core-base@11.1.12", "https://registry.npmmirror.com/@intlify/core-base/-/core-base-11.1.12.tgz", { "dependencies": { "@intlify/message-compiler": "11.1.12", "@intlify/shared": "11.1.12" } }, "sha512-whh0trqRsSqVLNEUCwU59pyJZYpU8AmSWl8M3Jz2Mv5ESPP6kFh4juas2NpZ1iCvy7GlNRffUD1xr84gceimjg=="],
+
+    "@intlify/devtools-types": ["@intlify/devtools-types@11.1.12", "https://registry.npmmirror.com/@intlify/devtools-types/-/devtools-types-11.1.12.tgz", { "dependencies": { "@intlify/core-base": "11.1.12", "@intlify/shared": "11.1.12" } }, "sha512-WYgdadYwOxZOAuhiCirQy2yjs7ZLBLEpllkbTbBEjFA7RsvzztJuYaEhHM+NIssyBcWWiWyC+IjgL2wnfK4uUQ=="],
 
     "@intlify/message-compiler": ["@intlify/message-compiler@11.1.12", "https://registry.npmmirror.com/@intlify/message-compiler/-/message-compiler-11.1.12.tgz", { "dependencies": { "@intlify/shared": "11.1.12", "source-map-js": "^1.0.2" } }, "sha512-Fv9iQSJoJaXl4ZGkOCN1LDM3trzze0AS2zRz2EHLiwenwL6t0Ki9KySYlyr27yVOj5aVz0e55JePO+kELIvfdQ=="],
 
